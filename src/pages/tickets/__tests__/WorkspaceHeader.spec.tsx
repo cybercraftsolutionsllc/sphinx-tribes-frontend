@@ -140,6 +140,19 @@ describe('WorkspaceHeader Component', () => {
     });
   });
 
+  it('uses the API languages query key when the workspace skill filter is active', async () => {
+    render(<WorkspaceHeader {...MockProps} languageString="javascript,typescript" />);
+
+    await waitFor(() => {
+      expect(mainStore.getSpecificWorkspaceBounties).toHaveBeenCalledWith(
+        MockProps.workspace_uuid,
+        expect.objectContaining({
+          languages: 'javascript,typescript'
+        })
+      );
+    });
+  });
+
   it('should trigger API call in response to click on status from WorkspaceHeader', async () => {
     const { getByText, getByRole, rerender } = render(<WorkspaceHeader {...MockProps} />);
 
@@ -200,7 +213,7 @@ describe('WorkspaceHeader Component', () => {
           page: 1,
           resetPage: true,
           ...updatedCheckboxIdToSelectedMap,
-          languageString: MockProps.languageString
+          direction: 'desc'
         }
       );
     });
