@@ -8,6 +8,10 @@ import { mainStore } from '../../../store/main.ts';
 import { uiStore } from '../../../store/ui.ts';
 import * as helpers from '../../../helpers/helpers-extended.ts';
 
+jest.mock('remark-gfm', () => null);
+
+jest.mock('rehype-raw', () => null);
+
 jest.mock('../../../store/main.ts', () => ({
   mainStore: {
     getUserRoles: jest.fn(),
