@@ -79,9 +79,14 @@ function makeQueryParams(limit: number, queryParams?: QueryParams): string {
     ...(queryParams?.resetPage ? { resetPage: String(queryParams.resetPage) } : {}),
     ...(queryParams?.page ? { page: String(queryParams.page) } : {}),
     ...(queryParams?.languages ? { languages: queryParams.languages } : {})
-  } as Record<string, string>;
+  } as Record<string, string | number | boolean | undefined>;
 
-  const searchParams = new URLSearchParams(adaptedParams);
+  const searchParams = new URLSearchParams();
+  Object.entries(adaptedParams).forEach(([key, value]) => {
+    if (value !== undefined) {
+      searchParams.set(key, String(value));
+    }
+  });
 
   return searchParams.toString();
 }
@@ -712,7 +717,11 @@ export class MainStore {
     const query2 = makeQueryParams(queryLimit, params ? queryParams : this.getWantedsPrevParams);
 
     try {
-      const ps2 = await api.get(`gobounties/all?${query2}`);
+      const jwtHeaders =
+        queryParams.myAssigned && uiStore.meInfo?.tribe_jwt
+          ? { 'x-jwt': uiStore.meInfo.tribe_jwt }
+          : undefined;
+      const ps2 = await api.get(`gobounties/all?${query2}`, undefined, jwtHeaders);
 
       const ps3: any[] = [];
 
@@ -1087,7 +1096,7 @@ export class MainStore {
       }
 
       const data = await response.json();
-      
+
       if (data && data.length) {
         const ps3: any[] = [];
         for (let i = 0; i < data.length; i++) {

@@ -183,6 +183,7 @@ export interface QueryParams {
   search?: string;
   resetPage?: boolean;
   languages?: string;
+  myAssigned?: boolean;
   org_uuid?: string;
   provider?: string;
   workspace?: string;
@@ -296,6 +297,7 @@ export interface BountyStatus {
   Paid: boolean;
   Pending: boolean;
   Failed: boolean;
+  myAssigned?: boolean;
 }
 
 export interface WorkspaceBudget {

@@ -13,6 +13,9 @@ function addMethod(m: string): (url: string, data?: any, incomingHeaders?: any) 
       const headers: { [key: string]: string } = {};
       const opts: { [key: string]: any } = { mode: 'cors' };
       headers['x-session-id'] = mainStore.getSessionId();
+      if (incomingHeaders) {
+        Object.assign(headers, incomingHeaders);
+      }
       console.log('Headers sesisonId: ', headers['x-session-id']);
       if (m === 'POST' || m === 'PUT') {
         if (!incomingHeaders) {

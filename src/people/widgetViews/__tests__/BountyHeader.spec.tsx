@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
 import { mainStore } from '../../../store/main';
+import { uiStore } from '../../../store/ui';
 import * as hooks from '../../../hooks';
 
 const mockHistoryPush = jest.fn();
@@ -54,6 +55,7 @@ jest.mock('../../../hooks', () => ({
 describe('BountyHeader Component', () => {
   beforeEach(() => {
     jest.spyOn(mainStore, 'getBountyHeaderData').mockReset();
+    uiStore.setMeInfo(null as any);
     (hooks.useIsMobile as jest.Mock).mockReturnValue(false);
   });
 
@@ -79,6 +81,34 @@ describe('BountyHeader Component', () => {
   test('should render the filters', () => {
     render(<BountyHeader {...mockProps} />);
     expect(screen.getByText(/Filter/i)).toBeInTheDocument();
+  });
+
+  test('should show assigned-to-me filter for authenticated users', async () => {
+    const onChangeStatus = jest.fn();
+    uiStore.setMeInfo({
+      pubkey: 'test_pubkey',
+      owner_pubkey: 'test_pubkey',
+      tribe_jwt: 'test_jwt'
+    } as any);
+
+    render(<BountyHeader {...mockProps} onChangeStatus={onChangeStatus} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Filter search/i }));
+
+    expect(await screen.findByText('ASSIGNMENT')).toBeInTheDocument();
+    const assignedToMe = screen.getByRole('checkbox', { name: 'Assigned to me' });
+    fireEvent.click(assignedToMe);
+
+    expect(onChangeStatus).toHaveBeenCalledWith('myAssigned');
+  });
+
+  test('should hide assigned-to-me filter for unauthenticated users', () => {
+    render(<BountyHeader {...mockProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Filter search/i }));
+
+    expect(screen.queryByText('ASSIGNMENT')).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', { name: 'Assigned to me' })).not.toBeInTheDocument();
   });
 
   test('should display the MobileFilterCount with correct number when filters are selected in mobile view', async () => {

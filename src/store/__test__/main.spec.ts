@@ -1257,6 +1257,38 @@ describe('Main store', () => {
     expect(store.peopleBounties[0].body.coding_languages).toEqual(filterCriteria.coding_languages);
   });
 
+  it('should send jwt when filtering bounties assigned to me', async () => {
+    const store = new MainStore();
+    const filterCriteria = {
+      limit: 25,
+      page: 1,
+      sortBy: 'created',
+      myAssigned: true
+    };
+
+    const apiResponse = {
+      status: 200,
+      ok: true,
+      json: async () => Promise.resolve([filterBounty])
+    };
+    fetchStub.callsFake((url: string, opts: RequestInit) => {
+      const urlObj = new URL(url);
+      const params = urlObj.searchParams;
+      const headers = opts?.headers as Headers;
+
+      expect(urlObj.origin).toBe(`http://${getHost()}`);
+      expect(urlObj.pathname).toBe('/gobounties/all');
+      expect(params.get('myAssigned')).toBe('true');
+      expect(headers.get('x-jwt')).toBe(user.tribe_jwt);
+
+      return Promise.resolve(apiResponse);
+    });
+
+    await store.getPeopleBounties(filterCriteria);
+
+    sinon.assert.calledOnce(fetchStub);
+  });
+
   it('should successfully fetch workspace users', async () => {
     const mockUsers: Person[] = [
       {

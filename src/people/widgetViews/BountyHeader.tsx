@@ -18,6 +18,7 @@ import { PostBounty } from './postBounty';
 
 const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
+const Assignment = [{ id: 'myAssigned', label: 'Assigned to me', value: 'myAssigned' }];
 
 interface styledProps {
   color?: any;
@@ -342,6 +343,7 @@ const BountyHeader = ({
   const color = colors['light'];
   const { main, ui } = useStores();
   const isMobile = useIsMobile();
+  const isAuthenticated = !!ui.meInfo?.tribe_jwt;
   const [peopleList, setPeopleList] = useState<Array<any> | null>(null);
   const [developerCount, setDeveloperCount] = useState<number>(0);
   const [activeBounty, setActiveBounty] = useState<Array<any> | number | null>(0);
@@ -569,6 +571,18 @@ const BountyHeader = ({
                       }}
                     />
                   </EuiPopOverCheckboxLeft>
+                  {isAuthenticated && (
+                    <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
+                      <EuiText className="leftBoxHeading">ASSIGNMENT</EuiText>
+                      <EuiCheckboxGroup
+                        options={Assignment}
+                        idToSelectedMap={checkboxIdToSelectedMap}
+                        onChange={(id: any) => {
+                          onChangeStatus(id);
+                        }}
+                      />
+                    </EuiPopOverCheckboxLeft>
+                  )}
                   <PopOverRightBox color={color}>
                     <EuiText className="rightBoxHeading">Tags</EuiText>
                     <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
@@ -731,6 +745,18 @@ const BountyHeader = ({
                     }}
                   />
                 </EuiPopOverCheckboxLeft>
+                {isAuthenticated && (
+                  <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
+                    <EuiText className="leftBoxHeading">ASSIGNMENT</EuiText>
+                    <EuiCheckboxGroup
+                      options={Assignment}
+                      idToSelectedMap={checkboxIdToSelectedMap}
+                      onChange={(id: any) => {
+                        onChangeStatus(id);
+                      }}
+                    />
+                  </EuiPopOverCheckboxLeft>
+                )}
                 <PopOverRightBox color={color}>
                   <EuiText className="rightBoxHeading">Tags</EuiText>
                   <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
